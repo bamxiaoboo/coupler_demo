@@ -207,6 +207,8 @@ program licom
     allocate(sstm(decomp_size),shfm(decomp_size))
     allocate(sshm(decomp_size),mldm(decomp_size))
 
+    call register_component_coupling_configuration(time_step, licom_comp_id)
+
     do i=1,time_length/time_step
         sstm = sst_l
         shfm = shf_l
