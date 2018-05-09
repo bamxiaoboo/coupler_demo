@@ -33,7 +33,7 @@ contains
     end subroutine register_grids_decomps
 
     subroutine register_component_coupling_configuration(decomp_size, sst, shf, ssh, mld, &
-            time_step, comp_id)
+            time_step, comp_id, comp_name, import_interface_id, export_interface_id)
 
         use CCPL_interface_mod
 
@@ -41,7 +41,9 @@ contains
 
         integer, intent(in)          :: decomp_size
         real(kind=RKIND), intent(in) :: sst(decomp_size), shf(decomp_size), ssh(decomp_size), mld(decomp_size)
+        character(len=*), intent(in) :: comp_name
         integer, intent(inout)       :: comp_id
+        integer, intent(out)         :: export_interface_id, import_interface_id
         character*1024               :: annotation
         integer                      :: time_step, timer_id, fields_id(5)
         integer                      :: field_id_psl, field_id_ts, field_id_flds, field_id_fsds
@@ -62,6 +64,20 @@ contains
         field_id_shf  = CCPL_register_field_instance(shf, "shf", decomp_id, grid_h2d_id, 0, usage_tag=CCPL_TAG_CPL_REST, field_unit="W/m2", annotation="register field instance of Net surface heat flux")
         field_id_ssh = CCPL_register_field_instance(ssh, "ssh", decomp_id, grid_h2d_id, 0, usage_tag=CCPL_TAG_CPL_REST, field_unit="m", annotation="register field instance of Sea surface height")
         field_id_mld = CCPL_register_field_instance(mld, "mld", decomp_id, grid_h2d_id, 0, usage_tag=CCPL_TAG_CPL_REST, field_unit="m", annotation="register field instance of Mixed layer depth")
+        !----------------register coupling timers to C-Coupler2--------------------------------
+        timer_id = CCPL_define_single_timer(licom_comp_id, "steps", 1, 0, 0, annotation="define a single timer for comp_id_licom")
+        !----------------register export interface to C-Coupler2--------------------------------
+        fields_id(1) = field_id_sst
+        fields_id(2) = field_id_shf
+        fields_id(3) = field_id_ssh
+        fields_id(4) = field_id_mld
+        export_interface_id = CCPL_register_export_interface("send_data_to_atm", 4, fields_id, timer_id, annotation="register interface for sending data to atmosphere")
+
+        fields_id(1) = field_id_psl
+        fields_id(2) = field_id_ts
+        fields_id(3) = field_id_fsds
+        fields_id(4) = field_id_flds
+        import_interface_id = CCPL_register_import_interface("receive_data_from_atm", 4, fields_id, timer_id, 0, annotation="register interface for receiving data from atmosphere")
 
     end subroutine register_component_coupling_configuration
 

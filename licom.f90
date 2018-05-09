@@ -159,6 +159,8 @@ program licom
     integer :: decomp_size
     integer, allocatable :: local_grid_cell_index(:,:)
 
+    integer :: import_interface_id, export_interface_id
+
     mpicom = CCPL_NULL_COMM
     call mpi_init(ier)
     call register_licom_component(mpicom)
@@ -209,7 +211,7 @@ program licom
     allocate(sstm(decomp_size),shfm(decomp_size))
     allocate(sshm(decomp_size),mldm(decomp_size))
 
-    call register_component_coupling_configuration(decomp_size, sstm, shfm, sshm, mldm, time_step, licom_comp_id)
+    call register_component_coupling_configuration(decomp_size, sstm, shfm, sshm, mldm, time_step, licom_comp_id, "licom", import_interface_id, export_interface_id)
 
     do i=1,time_length/time_step
         sstm = sst_l
