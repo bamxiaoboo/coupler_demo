@@ -78,6 +78,8 @@ contains
         fields_id(3) = field_id_fsds
         fields_id(4) = field_id_flds
         import_interface_id = CCPL_register_import_interface("receive_data_from_atm", 4, fields_id, timer_id, 0, annotation="register interface for receiving data from atmosphere")
+        !call CCPL_do_individual_coupling_generation(comp_id, annotation= "component "//comp_name//" generates the coupling procedure")
+        call CCPL_end_coupling_configuration(comp_id, annotation = "componnent "//comp_name//" ends registration")
 
     end subroutine register_component_coupling_configuration
 
